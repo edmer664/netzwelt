@@ -22,6 +22,7 @@ export default function LoginForm() {
   return (
     <div className="flex flex-col p-10 border-black border-2 mx-auto mt-10 w-1/2">
       <h1 className="text-2xl">Login</h1>
+      {error && <div className="text-red-500">{error}</div>}
       <input
         className="mt-2 border-black border-2"
         onChange={(e) => setUsername(e.target.value)}

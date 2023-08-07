@@ -9,7 +9,7 @@ export interface IUserData {
 }
 
 export interface ITerritory {
-  id: number;
+  id: string;
   name: string;
   parent: string | null;
 }
@@ -18,7 +18,7 @@ export default function useApi() {
   const storedUserData = localStorage.getItem("userData");
   const initialUserData = storedUserData ? JSON.parse(storedUserData) : null;
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState(null as string | null);
   const [userData, setUserData] = useState<IUserData | null>(initialUserData);
 
   interface ILogin {
@@ -43,7 +43,7 @@ export default function useApi() {
       return response.data;
     } catch (error: AxiosError | any) {
       setLoading(false);
-      setError(error);
+      setError("Invalid username or password. Please try again.");
     }
     return null;
   }
@@ -53,7 +53,7 @@ export default function useApi() {
     setUserData(null);
   }
 
-  async function getTerritories(): Promise<ITerritory[] | null> {
+  async function getTerritories(): Promise<{ data: ITerritory[] } | null> {
     setLoading(true);
     setError(null);
 
