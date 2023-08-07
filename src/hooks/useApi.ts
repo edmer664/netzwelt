@@ -1,6 +1,6 @@
 import { AxiosError } from "axios";
 import axios from "axios";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export interface IUserData {
   username: string;
@@ -15,11 +15,18 @@ export interface ITerritory {
 }
 
 export default function useApi() {
-  const storedUserData = localStorage.getItem("userData");
+  const isClient = typeof window !== "undefined";
+  const storedUserData = isClient ? localStorage.getItem("userData") : null;
   const initialUserData = storedUserData ? JSON.parse(storedUserData) : null;
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null as string | null);
   const [userData, setUserData] = useState<IUserData | null>(initialUserData);
+
+  useEffect(() => {
+    const storedUserData = localStorage.getItem("userData");
+    const initialUserData = storedUserData ? JSON.parse(storedUserData) : null;
+    setUserData(initialUserData);
+  }, []);
 
   interface ILogin {
     username: string;
@@ -39,7 +46,9 @@ export default function useApi() {
       const response = await axios.post("/api/login", data);
       setLoading(false);
       setUserData(response.data);
-      localStorage.setItem("userData", JSON.stringify(response.data));
+      if (isClient) {
+        localStorage.setItem("userData", JSON.stringify(response.data));
+      }
       return response.data;
     } catch (error: AxiosError | any) {
       setLoading(false);
@@ -49,7 +58,9 @@ export default function useApi() {
   }
 
   function logout() {
-    localStorage.removeItem("userData");
+    if (isClient) {
+      localStorage.removeItem("userData");
+    }
     setUserData(null);
   }
 
